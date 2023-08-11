@@ -92,7 +92,8 @@ class Calendar:
         self.screen = pygame.display.set_mode((Calendar.TOTAL_WIDTH, Calendar.HEIGHT))
         self.schedules = schedules
         self.schedule_index = 0
-        self.space_pressed = False
+        self.right_pressed = False
+        self.left_pressed = False
         self.color_map = self.get_color_map()
 
     def display_dates(self):
@@ -155,16 +156,31 @@ class Calendar:
         self.display_dates()
         self.display_schedule()
 
+    def go_right(self, keys):
+        for key in keys:
+            if pygame.key.get_pressed()[key]:
+                self.right_pressed = True
+            else:
+                if self.right_pressed:
+                    self.schedule_index += 1
+                    self.schedule_index %= len(self.schedules)
+                    self.draw()
+                self.right_pressed = False
+
+    def go_left(self, keys):
+        for key in keys:
+            if pygame.key.get_pressed()[key]:
+                self.left_pressed = True
+            else:
+                if self.left_pressed:
+                    self.schedule_index -= 1
+                    self.schedule_index %= len(self.schedules)
+                    self.draw()
+                self.left_pressed = False
+
     def update(self):
-        pressed = pygame.key.get_pressed()
-        if pressed[pygame.K_SPACE]:
-            self.space_pressed = True
-        else:
-            if self.space_pressed:
-                self.schedule_index += 1
-                self.schedule_index %= len(self.schedules)
-                self.draw()
-            self.space_pressed = False
+        self.go_right([pygame.K_SPACE, pygame.K_RIGHT])
+        self.go_left([pygame.K_LEFT])
 
     def show(self):
         running = True
