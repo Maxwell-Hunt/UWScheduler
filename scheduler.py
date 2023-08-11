@@ -82,7 +82,7 @@ class Calendar:
     TOTAL_MINUTES = 780
     TITLE_HEIGHT = 30
     TITLE_GAP = 40
-    COLORS = ['red', 'orange', 'pink', 'blue', 'yellow', 'grey', 'purple', 'green', 'brown']
+    COLORS = ['red', 'orange', 'pink', 'purple', 'grey', 'green', 'blue', 'yellow']
     
     def __init__(self, schedules):
         pygame.init()
@@ -93,6 +93,7 @@ class Calendar:
         self.schedules = schedules
         self.schedule_index = 0
         self.space_pressed = False
+        self.color_map = self.get_color_map()
 
     def display_dates(self):
         days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
@@ -118,7 +119,18 @@ class Calendar:
             pygame.draw.line(self.screen, 'black', (0, height), (Calendar.TOTAL_WIDTH, height))
             text_rect.center = (50, height)
             self.screen.blit(text, text_rect)
-            
+
+    def get_color_map(self):
+        color_index = 0
+        color_map = {}
+        for day in self.schedules[0]:
+            for course in day:
+                course_name = course['course'].split()[0]
+                if not course_name in color_map:
+                    color_map[course_name] = Calendar.COLORS[color_index]
+                    color_index += 1
+                    color_index %= len(Calendar.COLORS)
+        return color_map
 
     def display_schedule(self):
         for i, day in enumerate(self.schedules[self.schedule_index]):
@@ -130,8 +142,9 @@ class Calendar:
                 left = Calendar.WIDTH / 5 * i + (Calendar.WIDTH / 5 - width) / 2 + width_diff / 2
                 
                 height = bottom - top
-                pygame.draw.rect(self.screen, 'red', pygame.Rect(left, top, width, height))
-                text = self.font_small.render(course['course'], True, 'black', 'red')
+                course_name = course['course'].split()[0]
+                pygame.draw.rect(self.screen, self.color_map[course_name], pygame.Rect(left, top, width, height))
+                text = self.font_small.render(course['course'], True, 'black', self.color_map[course_name])
                 text_rect = text.get_rect()
                 text_rect.center = (left + width / 2, top + height / 2)
                 self.screen.blit(text, text_rect)
