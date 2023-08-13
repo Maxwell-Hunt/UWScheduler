@@ -1,6 +1,5 @@
 import pygame
 import json
-import time
 from copy import deepcopy
 
 class Schedule:
@@ -9,6 +8,7 @@ class Schedule:
         self.info = self.load_info()
         self.class_dict = self.get_courses()
         self.schedules = self.generate_schedules()
+        self.sort_schedules()
 
     def load_info(self):
         info = None
@@ -57,6 +57,15 @@ class Schedule:
                 schedules.extend(result)
         return schedules
 
+    def sort_schedules(self):
+        def get_earliest_start_time(schedule):
+            result = 10000000000
+            for day in schedule:
+                for course in day:
+                    result = min(result, course['time'][0])
+            return result
+        
+        self.schedules = sorted(self.schedules, key=get_earliest_start_time, reverse=True)
     
     def get_schedules(self):
         return self.schedules
